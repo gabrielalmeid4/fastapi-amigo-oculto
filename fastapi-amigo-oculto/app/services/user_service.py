@@ -3,6 +3,7 @@ from app.models.user import User
 from app.repositories.base_repositories import BaseUserRepository
 from app.providers.base_token import BaseTokenProvider
 from app.providers.base_hash import BaseHashProvider
+from app.presentation.exceptions.user_exceptions import HTTPEmailAlreadyExists
 from dotenv import load_dotenv
 import os
 
@@ -19,14 +20,14 @@ class UserService:
 
     async def registrar_user(self, nome: str, email: str, senha: str) -> User:     
         if await self.user_repository.get_by_email(email):
-            raise ValueError("Email já cadastrado.")   
-        await self.user_repository.save(nome, email, senha)
-        hashed_password = self.hash_provider.hash_password(senha)
-        
-        return User(nome=nome, email=email, senha=hashed_password)
+            raise HTTPEmailAlreadyExists()
+        await self.user_repository.save(nome, email, senha) 
+        user_created = await self.user_repository.get_by_email(email)
+        hashed_password = await self.hash_provider.hash_password(senha)
+        return User(id_user=user_created.id_user, nome=nome, email=email, senha=hashed_password)
     async def login(self, email: str, senha: str) -> str:
         user: User = await self.user_repository.get_by_email(email)
         if user and self.hash_provider.verify_password(senha, user.senha):
-            token = self.token_provider.create_token({user.id}, SECRET_KEY, ALGORITHM, timedelta(minutes=30))
+            token = await self.token_provider.create_token({user.id}, SECRET_KEY, ALGORITHM, timedelta(minutes=30))
             return token
        

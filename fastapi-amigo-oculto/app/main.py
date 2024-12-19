@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from app.controllers.user_controller import router as user_router
-from app.controllers.grupo_controller import router as grupo_router
-from app.controllers.participante_controller import router as participante_router
+from app.presentation.controllers.user_controller import router as user_router
+from app.presentation.controllers.grupo_controller import router as grupo_router
+from app.presentation.controllers.participante_controller import router as participante_router
 
 app = FastAPI()
 

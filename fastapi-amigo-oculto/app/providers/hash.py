@@ -6,5 +6,5 @@ class HashProviderBCrypt(BaseHashProvider):
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(senha.encode('utf-8'), salt)
         return hashed_password.decode('utf-8')
-    def verify_password(senha: str, hashed_password: str) -> bool:
+    async def verify_password(senha: str, hashed_password: str) -> bool:
         return bcrypt.checkpw(senha.encode('utf-8'), hashed_password.encode('utf-8'))
